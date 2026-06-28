@@ -1,5 +1,14 @@
 # Home Lab
 
+### Dell Vostro 1550 (Server Node)
+
+**Specs:**
+- CPU:  Intel i3-2310M (4) @ 2.100GHz
+- RAM: 6GB
+- Storage: Crucial BX500 500GB SSD (CT500BX500SSD1)
+- OS: Ubuntu 24.04.4 LTS x86_64
+This is Mainly used to run Docker containers, and to send WOL to Proxmox PC when needed via Upsnap
+  
 ### MSI GF65 Thin 10UE (Proxmox Host)
 
 **Specs:**
@@ -9,20 +18,12 @@
 - Storage: Western Digital 1TB SN730 NVMe SSD (WDC PC SN730 SDBPNTY-1T00-1032)
 - OS: Proxmox VE 9.1.6
 
-### Dell Vostro 1550 (Server Node)
-
-**Specs:**
-- CPU:  Intel i3-2310M (4) @ 2.100GHz
-- RAM: 6GB
-- Storage: Crucial BX500 500GB SSD (CT500BX500SSD1)
-- OS: Ubuntu 24.04.4 LTS x86_64
-
-| Name | Type | OS | Purpose | Status |
-|------|------|----|---------|---------| 
-| [Testing Windows Env] | VM | Windows 11 |Test apps on internet with low reputaion With GPU passthrough, Parsec streaming | Stopped |
-| [Personal Windows Env] | VM | Windows 11 | Video editing with GPU passthrough, Parsec streaming | Stopped |
-| [Linux Ubuntu Env] | VM | Ubuntu 22.04 | Development environment and OLLAMA server | Running |
-| [OpenClaw] | LXC | Ubuntu 22.04 template | OpenClaw sandbox | Stopped |
+| Name | Type | OS | Purpose |
+|------|------|----|---------|
+| Testing Windows Env | VM | Windows 11 |Test apps on internet with low reputaion With GPU passthrough, Parsec streaming |
+| Personal Windows Env | VM | Windows 11 | Video editing with GPU passthrough, Parsec streaming |
+| Linux Ubuntu Env | VM | Ubuntu 22.04 | Development environment and OLLAMA server |
+| [OpenClaw] | LXC | Ubuntu 22.04 template | OpenClaw sandbox |
 
 Due to GPU passthrough I can Only run Testing or Personal or Linux at a time. If I try to run multiple, the start command will return PCI in use error
 
