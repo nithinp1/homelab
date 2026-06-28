@@ -360,7 +360,7 @@ DefinitionBlock ("", "SSDT", 2, "BOCHS", "BXPCSSDТ", 0x00000001)
 | Memory | 12288 MB (leave ~4GB for host) |
 | Disk | VirtIO Block, 256GB |
 | Network | VirtIO |
-| Display | none (after Windows install) |
+| Display | std (after parsec install `none`) |
 | TPM | v2.0 |
 
 ### Final VM config `/etc/pve/qemu-server/100.conf`
@@ -385,14 +385,14 @@ ostype: win11
 scsihw: virtio-scsi-single
 sockets: 1
 tpmstate0: local-lvm:vm-100-disk-1,size=4M,version=v2.0
-vga: none
+vga: std
 virtio0: local-lvm:vm-100-disk-2,cache=writeback,discard=on,iothread=1,size=256G
 ```
 
 **Key config notes:**
 - `cpu: host,hidden=1` — hides hypervisor from Nvidia (PVE 9 syntax, NOT `kvm=off` in cpu line)
 - `kvm: 0` — do NOT use, breaks `cpu: host` requirement
-- `vga: std` — use Console for windows setup, need to change back to 'none' after parsec is installed and running
+- `vga: std` — use Console for windows setup, change back to 'none' after parsec with Virtual Display is installed and running
 - `hostpci0` uses `0000:01:00` not `0000:01:00.0` — Proxmox 9 handles all functions
 - `args` line carries the SSDT injection and ACPI power management flags
 
