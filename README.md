@@ -227,6 +227,21 @@ homelab/
 └── docs/
     └── ARCHITECTURE.md                          # (planned) Deep dive
 ```
+---
+
+## Screenshots and Setup Gallery
+
+A few representative images from the lab are included below to give a visual overview of the setup.
+
+<p align="center">
+  <img src="./assets/s1.png" alt="Homelab overview" width="45%">
+  <img src="./assets/s2.png" alt="Proxmox VM view" width="45%">
+</p>
+
+<p align="center">
+  <img src="./assets/s3.png" alt="Docker automation setup" width="45%">
+  <img src="./assets/s4.png" alt="Infrastructure snapshot" width="45%">
+</p>
 
 ---
 
