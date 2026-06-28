@@ -1,0 +1,653 @@
+{
+  "name": "Youtube auto upload workflow",
+  "nodes": [
+    {
+      "parameters": {
+        "resource": "video",
+        "operation": "analyze",
+        "modelId": {
+          "__rl": true,
+          "value": "models/gemini-2.5-flash",
+          "mode": "list",
+          "cachedResultName": "models/gemini-2.5-flash"
+        },
+        "text": "Watch this gaming gameplay video clip carefully.\n1. Gameplay & Tactical Analysis\nAnalyze the eFootball 2026 Mobile gameplay. Identify the match type (e.g., Division rank push, Co-op), tactical setup (formation, team playstyle like Quick Counter), and key actions(e.g., Double Touch, Match-up defending, or Epic player card performances).\n2. High-CTR Title Generation\nCreate a high-click-through-rate (CTR) YouTube title under 60 characters tailored to the eFootball Mobile community. Target high-interest angles (e.g., Division 1 tactics, meta formations, Booster Epic reviews) without using generic filler words.\n3. SEO Description\nWrite an SEO-optimized video description summarizing the top highlights (e.g., clutch wins, skill tutorials, pack openings).\n\nYou MUST respond strictly in a raw, valid JSON object structure. Do not wrap the JSON inside markdown code blocks (no ```json formatting blocks). Output exactly this structure:\n\n{\n  \"title\": \"INSERT_TITLE_HERE\",\n  \"description\": \"INSERT_DESCRIPTION_HERE\"\n}",
+        "inputType": "binary",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.googleGemini",
+      "typeVersion": 1.2,
+      "position": [
+        96,
+        288
+      ],
+      "id": "17ab73e7-1340-4844-931d-cce45a0894c1",
+      "name": "Analyze video",
+      "retryOnFail": true,
+      "waitBetweenTries": 5000,
+      "credentials": {
+        "googlePalmApi": {
+          "id": "sETXNCsvcuEIgCUN",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      },
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "operation": "download",
+        "fileId": {
+          "__rl": true,
+          "value": "={{ $json.id }}",
+          "mode": "id"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        -128,
+        160
+      ],
+      "id": "f3f72637-4315-469f-8ec3-a81e55db6528",
+      "name": "Download file",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "HPYsTCCQpL4ARyJQ",
+          "name": "Google Drive account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "video",
+        "operation": "upload",
+        "title": "={{ $('Merge').item.json.title }}",
+        "regionCode": "IN",
+        "categoryId": "=20",
+        "binaryProperty": "=output_video",
+        "options": {
+          "description": "={{ $('Merge').item.json.description }}"
+        }
+      },
+      "type": "n8n-nodes-base.youTube",
+      "typeVersion": 1,
+      "position": [
+        2336,
+        112
+      ],
+      "id": "6926f65a-74dd-4435-ba49-2ed9d4944719",
+      "name": "Upload a video",
+      "credentials": {
+        "youTubeOAuth2Api": {
+          "id": "aa4slbNx8wssKjF6",
+          "name": "Stiq FC"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "3c99ee0e-5a7a-4765-9291-9237ef4b4320",
+              "name": "title",
+              "value": "={{ JSON.parse($json.content.parts[0].text.replace(/```json\\n|```/g, \"\")).title }}",
+              "type": "string"
+            },
+            {
+              "id": "7eab6da9-2ba1-4a8b-854c-35ece9aad3cd",
+              "name": "description",
+              "value": "={{ JSON.parse($json.content.parts[0].text.replace(/```json\\n|```/g, \"\")).description }} \n#eFootball #eFootball2026 #eFootballMobile #eFootball2025 #PES #PESMobile #Konami #Gaming #MobileGaming #FootballGaming #SoccerGame #eFootballHighlights #GoalHighlights #EpicGoal #GamingClips #Football #Goals #SkillMoves #MobileGames #OnlineGaming #ProGameplay #GamingCommunity #ViralGaming #Shorts #YouTubeShorts #Reels #TikTokGaming #FCMobile #DreamTeam #eFootballCommunity #Gamer #GamingVideos #FootballHighlights #ConsoleGaming #AndroidGaming #iOSGaming #MatchWinner #ClutchGoal #GoalOfTheDay #Esports",
+              "type": "string"
+            }
+          ]
+        },
+        "includeOtherFields": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        336,
+        224
+      ],
+      "id": "52eafefe-a689-40c4-a649-65286a512b07",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "operation": "move",
+        "fileId": {
+          "__rl": true,
+          "value": "={{ $('Loop Over Items').item.json.id }}",
+          "mode": "id"
+        },
+        "driveId": {
+          "__rl": true,
+          "mode": "list",
+          "value": "My Drive"
+        },
+        "folderId": {
+          "__rl": true,
+          "value": "1x7kus9V6_k8ordWfW_a3rL2DIofymSVF",
+          "mode": "list",
+          "cachedResultName": "2-Published-files",
+          "cachedResultUrl": "https://drive.google.com/drive/folders/1x7kus9V6_k8ordWfW_a3rL2DIofymSVF"
+        }
+      },
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        2560,
+        256
+      ],
+      "id": "afcf74a7-6dfc-456b-b0b0-21197d9d05a3",
+      "name": "Move file",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "HPYsTCCQpL4ARyJQ",
+          "name": "Google Drive account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "chatId": "-5110636361",
+        "text": "=Youtube Video Succesfuly Uploaded!\nTitle used : {{ $('Merge').item.json.title }}\nDesc used : {{ $('Merge').item.json.description }}\n\n'https://www.youtube.com/shorts/{{ $json.uploadId }}'\nif the above link fails use this 👇\nhttps://www.youtube.com/shorts/{{ $json.uploadId.replace('_', '\\\\_') }}",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        2560,
+        64
+      ],
+      "id": "4a1bc10e-5860-4b08-b7fe-45806ddf26f9",
+      "name": "Send a text message",
+      "webhookId": "4aa9542c-bf60-4952-9a2c-4feb272a7bc2",
+      "credentials": {
+        "telegramApi": {
+          "id": "2k7pbhiVxbVXphzM",
+          "name": "Telegram account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1hFDKPYYtRLUWyLCaYewIyOgEFTvfmbcH8p1a1IR1q9g",
+          "mode": "list",
+          "cachedResultName": "efootball-video-title",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1hFDKPYYtRLUWyLCaYewIyOgEFTvfmbcH8p1a1IR1q9g/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1hFDKPYYtRLUWyLCaYewIyOgEFTvfmbcH8p1a1IR1q9g/edit#gid=0"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        768,
+        304
+      ],
+      "id": "7b01945a-d2ac-44f7-8e67-a1ee150f7b96",
+      "name": "Get row(s) in sheet",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "0HkFOpWlGeT9Zehr",
+          "name": "Scrop account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// Use traditional modern syntax for all n8n versions\nconst allRows = $input.all();\n\nif (allRows.length === 0) {\n    return [];\n}\n\n// Select one random row index\nconst randomIndex = Math.floor(Math.random() * allRows.length);\n\n// Return only that specific random row\nreturn [allRows[randomIndex]];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        992,
+        304
+      ],
+      "id": "6140329e-45d0-47e7-8284-d1ec7e2520ee",
+      "name": "Code in JavaScript"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "3c99ee0e-5a7a-4765-9291-9237ef4b4320",
+              "name": "title",
+              "value": "={{ $json.Title }}",
+              "type": "string"
+            },
+            {
+              "id": "7eab6da9-2ba1-4a8b-854c-35ece9aad3cd",
+              "name": "description",
+              "value": "=#eFootball #eFootball2026 #eFootballMobile #eFootball2025 #PES #PESMobile #Konami #Gaming #MobileGaming #FootballGaming #SoccerGame #eFootballHighlights #GoalHighlights #EpicGoal #GamingClips #Football #Goals #SkillMoves #MobileGames #OnlineGaming #ProGameplay #GamingCommunity #ViralGaming #Shorts #YouTubeShorts #Reels #TikTokGaming #FCMobile #DreamTeam #eFootballCommunity #Gamer #GamingVideos #FootballHighlights #ConsoleGaming #AndroidGaming #iOSGaming #MatchWinner #ClutchGoal #GoalOfTheDay #Esports",
+              "type": "string"
+            }
+          ]
+        },
+        "includeOtherFields": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1216,
+        304
+      ],
+      "id": "a6aaef8e-149e-4573-ba0a-91ac12560efd",
+      "name": "Edit Fields1"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "e6affc1c-08b9-4170-bf2f-c1adc6bcfc80",
+              "leftValue": "={{ $json.title }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "exists",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        560,
+        240
+      ],
+      "id": "98d592d0-60ba-45f4-a122-498cb4cefc53",
+      "name": "If"
+    },
+    {
+      "parameters": {
+        "operation": "write",
+        "fileName": "/data/shared/input_video.mp4",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.readWriteFile",
+      "typeVersion": 1.1,
+      "position": [
+        1664,
+        112
+      ],
+      "id": "43fdef1a-798e-4b60-8755-0890746ba69d",
+      "name": "Read/Write Files from Disk"
+    },
+    {
+      "parameters": {
+        "command": "=ffmpeg -y -color_range tv -i {{ $json.fileName }} -filter_complex \"[0:v]split=2[bg][fg];[bg]scale=1080:1920:force_original_aspect_ratio=increase,crop=1080:1920,boxblur=luma_radius=15:luma_power=3,setsar=1[bg_blurred];[fg]scale=1280:-2,crop=1080:ih:(iw-1080)/2:0,setsar=1[fg_scaled];[bg_blurred][fg_scaled]overlay=(main_w-overlay_w)/2:(main_h-overlay_h)/2,setsar=1\" -pix_fmt yuv420p -c:v libx264 -preset superfast -crf 26 -c:a copy /data/shared/output_video.mp4"
+      },
+      "type": "n8n-nodes-base.executeCommand",
+      "typeVersion": 1,
+      "position": [
+        1888,
+        112
+      ],
+      "id": "408f90b7-e139-48b5-80f3-aa3b3fc48f29",
+      "name": "Execute Command"
+    },
+    {
+      "parameters": {
+        "fileSelector": "/data/shared/output_video.mp4",
+        "options": {
+          "dataPropertyName": "output_video"
+        }
+      },
+      "type": "n8n-nodes-base.readWriteFile",
+      "typeVersion": 1.1,
+      "position": [
+        2112,
+        112
+      ],
+      "id": "3fc8feca-b382-474c-bde9-50ce45e9cb92",
+      "name": "Read/Write Files from Disk1"
+    },
+    {
+      "parameters": {
+        "mode": "combine",
+        "combineBy": "combineAll",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.2,
+      "position": [
+        1440,
+        112
+      ],
+      "id": "eec0de3a-ae12-4e7d-afee-93464a657945",
+      "name": "Merge"
+    },
+    {
+      "parameters": {
+        "command": "cd /data/shared && rm *.mp4"
+      },
+      "type": "n8n-nodes-base.executeCommand",
+      "typeVersion": 1,
+      "position": [
+        2784,
+        256
+      ],
+      "id": "bc3a922d-09b5-41ab-b93d-61e5f3b80888",
+      "name": "Execute Command1"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        -352,
+        144
+      ],
+      "id": "3ac8cc3c-87e6-48b7-b82e-b771b19394c0",
+      "name": "Loop Over Items"
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "hours"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.3,
+      "position": [
+        -864,
+        128
+      ],
+      "id": "9a8b5913-02d5-4a06-9869-85644218b21a",
+      "name": "Schedule Trigger"
+    },
+    {
+      "parameters": {
+        "resource": "fileFolder",
+        "returnAll": true,
+        "filter": {
+          "folderId": {
+            "__rl": true,
+            "value": "1fO9cfCul5AY4vFIECzUJWJGtGCuf1qTh",
+            "mode": "list",
+            "cachedResultName": "1-Uploaded-Clips",
+            "cachedResultUrl": "https://drive.google.com/drive/folders/1fO9cfCul5AY4vFIECzUJWJGtGCuf1qTh"
+          }
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        -640,
+        128
+      ],
+      "id": "9334ad78-6613-4ef6-b535-91ea808482d5",
+      "name": "Search files and folders",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "HPYsTCCQpL4ARyJQ",
+          "name": "Google Drive account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Download file": {
+      "main": [
+        [
+          {
+            "node": "Analyze video",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Analyze video": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Get row(s) in sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Upload a video": {
+      "main": [
+        [
+          {
+            "node": "Move file",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Send a text message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Move file": {
+      "main": [
+        [
+          {
+            "node": "Execute Command1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get row(s) in sheet": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields1": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 1
+          }
+        ],
+        [
+          {
+            "node": "Get row(s) in sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Read/Write Files from Disk": {
+      "main": [
+        [
+          {
+            "node": "Execute Command",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Execute Command": {
+      "main": [
+        [
+          {
+            "node": "Read/Write Files from Disk1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Read/Write Files from Disk1": {
+      "main": [
+        [
+          {
+            "node": "Upload a video",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Merge": {
+      "main": [
+        [
+          {
+            "node": "Read/Write Files from Disk",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Loop Over Items": {
+      "main": [
+        [],
+        [
+          {
+            "node": "Download file",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Execute Command1": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "Search files and folders",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Search files and folders": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "timeSavedMode": "fixed",
+    "timezone": "Asia/Kolkata",
+    "callerPolicy": "workflowsFromSameOwner",
+    "availableInMCP": false
+  },
+  "versionId": "68465cf4-4669-4efc-a310-e96cc8de7129",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "d3ab0ad07416bb209dc406f4c86a2f9e3258d49cb4c5cc6023fb70732d524de5"
+  },
+  "nodeGroups": [],
+  "id": "QzBsRVB0nZ3vE9yb",
+  "tags": []
+}

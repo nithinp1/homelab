@@ -1,0 +1,2 @@
+# N8N 
+## The n8n config is tailored for my setup and slightly removed my custom preferences but still if you want to use this setup I highly recommed that you refer from youtube or [official n8n documention](https://docs.n8n.io/deploy/host-n8n) as if I may have missed any setup configs.

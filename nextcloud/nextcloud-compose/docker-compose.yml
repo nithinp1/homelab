@@ -1,0 +1,32 @@
+name: nextcloud-aio
+services:
+  nextcloud-aio-mastercontainer:
+    image: ghcr.io/nextcloud-releases/all-in-one:latest
+    init: true
+    restart: always
+    container_name: nextcloud-aio-mastercontainer
+    volumes:
+      # FIX 1: This MUST be a named volume, not a relative host path
+      - nextcloud_aio_mastercontainer:/mnt/docker-aio-config
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+    network_mode: bridge
+    ports:
+      - "8444:8080" # Maps setup wizard locally
+    environment:
+      # FIX 2: This MUST be an absolute path, not a relative system path (./)
+      - NEXTCLOUD_DATADIR=/home/{your-username}/volumes/nextcloud/nextcloud_data
+      # - NEXTCLOUD_UPLOAD_LIMIT=5G #Use if disk space is low 
+      # - NEXTCLOUD_MEMORY_LIMIT=512M #Use if server is on low ram
+      - APACHE_PORT=11000
+      - APACHE_IP_BINDING=0.0.0.0
+      - SKIP_DOMAIN_VALIDATION=true
+    #  - AIO_DOCKER_LABELS=tsdproxy.enable=true,tsdproxy.name=next,tsdproxy.port.1=443/https:11000/http
+    # I use tsdproxy ignore these label and they are not required for normal setup 
+    #labels:
+    #  - "tsdproxy.enable=true"
+    #  - "tsdproxy.name=next"
+    #  - "tsdproxy.port.1=443/https:11000/http"
+
+volumes:
+  nextcloud_aio_mastercontainer:
+    name: nextcloud_aio_mastercontainer # Keep this intact for AIO internal backups

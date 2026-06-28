@@ -1,0 +1,16 @@
+name: adguard-home
+services:
+  adguardhome:
+    image: adguard/adguardhome:latest
+    container_name: adguard-home
+    restart: always
+    volumes:
+      - /home//volumes/adguard/workdir:/opt/adguardhome/work
+      - /home/{your-username}/volumes/adguard/confdir:/opt/adguardhome/conf
+    ports:
+      - "53:53/tcp"
+      - "53:53/udp"
+      - "3000:3000/tcp" # This is the port for the initial setup wizard
+      - "8053:8053/tcp"
+      - "853:853/tcp"  # Optional: Encrypted DNS (DoT)
+    network_mode: bridge

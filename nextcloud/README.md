@@ -1,0 +1,2 @@
+# NextCloud
+## The NextCloud config is tailored for my setup and slightly removed my custom preferences but still if you want to use this setup I highly recommed that you refer from youtube or [official Nexcloud documention](https://docs.nextcloud.com/server/stable/admin_manual/installation/system_requirements.html#server) as if I may have missed any setup configs.
